@@ -1,4 +1,4 @@
-name: HTML CI Pipeline
+name: CI and SonarQube Analysis
 
 on:
   push:
@@ -9,13 +9,15 @@ on:
       - main
 
 jobs:
-  test:
-    name: Test HTML Website
+  test-and-scan:
+    name: Test and SonarQube Scan
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check HTML file exists
         run: test -f index.html
@@ -23,5 +25,10 @@ jobs:
       - name: Check HTML content
         run: grep -q "Welcome to My CI/CD Project!" index.html
 
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: CI successful
-        run: echo "HTML CI pipeline passed successfully!"
+        run: echo "Tests and SonarQube scan completed!"
